@@ -115,4 +115,4 @@ Gain = (GHZN1ln-GHZN0ln)/GHZN0ln
 
 #----------------------------***Plot the Results***----------------------------
 
-Gain_vs_N(r, Gain, tot, modes, krr)
+Gain_vs_N(r, Gain, modes, krr)

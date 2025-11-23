@@ -19,7 +19,8 @@ marker = ['s', '^', 'P', "o", "p", "3", "4",  "8", "*" ]
 titles = [r'$(AB)_{1/4}-C_{3/4}$', r'$(AB)_{1/2}-C_{1/2}$', r'$(AB)_{3/4}-C_1$', r'$Tr(D_{1/4}) (AB)_{1/4}-C_{1/4}$', r'$Tr(D_{1/4}) (AB)_{1/2}-C_{1/4}$', r'$Tr(D_{1/2}) (AB)_{1/4}-C_{1/4}$', r'$Tr((AB)_{1/4}) C_{1/2}-D_{1/4}$', r'$Tr((AB)_{1/2}) C_{1/4}-D_{1/4}$']
 
 
-def logneg_vs_r(r, GHZN0ln, GHZN1ln, tot, modes, krr):
+def logneg_vs_r(r, GHZN0ln, GHZN1ln, modes, krr):
+    tot = len(krr)
     labels = ['N='+str(modes[i])+' $k=$'+'%.2f' % krr[i] for i in range(tot)]
     col = sns.color_palette("hls", len(krr))
 # =============================================================================
@@ -83,7 +84,8 @@ def logneg_vs_r(r, GHZN0ln, GHZN1ln, tot, modes, krr):
     
     
     
-def Gain_vs_r(r, Gain, tot, modes, krr):
+def Gain_vs_r(r, Gain, modes, krr):
+    tot = len(krr)
     labels = ['N='+str(modes[i])+' $k=$'+'%.2f' % krr[i] for i in range(tot)]
     col = sns.color_palette("hls", len(krr))
     
@@ -105,7 +107,31 @@ def Gain_vs_r(r, Gain, tot, modes, krr):
     fig.legend(loc='lower center', bbox_to_anchor=(0.5, 0.), ncol=1)
     plt.tight_layout(rect=[0, 0.12, 1, 1])
     
-def Gain_vs_N(r, Gain, tot, modes, krr):
+def Gain_vs_k(krr, Gain, modes, r):
+    M=len(modes)
+    labels = ['N='+str(modes[i])+' $r=$'+ str(r) for i in range(M)]
+    col = sns.color_palette("hls", M)
+    
+    fig, axes = plt.subplots(4, 2, figsize=(8, 10))
+    axes = axes.flatten()
+    for k in range(8):
+        for i in range(M):
+             gain, = axes[k].plot(krr, Gain[k][i], color=col[i], linestyle=lsty[i], linewidth=2)
+             #print(titles[k]+str(modes[i])+'='+str(krr[np.argmax(GHZN1ln[k][i])]))
+             if k==0:
+                 gain.set_label(labels[i])
+        if k+1>6:
+            axes[k].set_xlabel(r'$k=r_2/r_1$')
+        if k % 2 == 0:
+            axes[k].set_ylabel('Gain')
+        axes[k].grid(True)
+        
+        axes[k].set_title(titles[k])
+    fig.legend(loc='lower center', bbox_to_anchor=(0.5, 0.), ncol=1)
+    plt.tight_layout(rect=[0, 0.12, 1, 1])
+    
+def Gain_vs_N(r, Gain, modes, krr):
+    tot = len(krr)
     labels = ['$k=$'+'%.2f' % krr[i] for i in range(tot)]
     col = sns.color_palette("hls", len(krr))
     
@@ -131,3 +157,29 @@ def Gain_vs_N(r, Gain, tot, modes, krr):
         axes[k].set_title(titles[k])
     fig.legend(loc='lower center', bbox_to_anchor=(0.5, 0.), ncol=1)
     plt.tight_layout(rect=[0, 0.12, 1, 1])
+
+
+def Gain_vs_loss(loss, GHZN0ln, GHZN1ln, r, krr):
+    tot=len(krr)
+    nn = len(r)
+    
+    labels = ['$k=$'+'%.2f' % krr[i] for i in range(tot)]
+    col = sns.color_palette("Set2", int(tot*nn*2))
+    
+    fig, axes = plt.subplots(4, 2, figsize=(8, 10))
+    axes = axes.flatten()
+    
+    for k in range(8):
+        for m in range(nn):
+            logneg0, = axes[k].plot(loss, GHZN0ln[k][m], color=col[m], linewidth=2)
+            logneg1, = axes[k].plot(loss, GHZN1ln[k][m], color=col[m+1], linewidth=2)
+        axes[k].set_title(titles[k])
+        if k+1>6:
+            axes[k].set_xlabel('Loss')
+        if k % 2 == 0:
+            axes[k].set_ylabel('log neg')
+        if k==0:
+            logneg0.set_label(r'$|\phi_0>$, N=4, r='+str(r[m])+' k='+str(krr[0]))
+            logneg1.set_label(r'$\hat{a}_A|\phi_0>$, N=4, r='+str(r[m])+' k='+str(krr[0]))
+    fig.legend(loc='lower center', bbox_to_anchor=(0.5, 0.), ncol=1)
+    plt.tight_layout(rect=[0, 0.05, 1, 1])
