@@ -2,7 +2,7 @@
 """
 Created on Sun Nov 16 16:49:50 2025
 
-@author: zachl
+@author: zacharie-leger
 """
 
 from qutip import *

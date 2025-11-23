@@ -2,19 +2,18 @@
 """
 Created on Sun Nov 16 17:02:37 2025
 
-@author: zachl
+@author: zacharie-leger
 """
 
 import numpy as np
 import numpy.linalg as la
 import matplotlib.pyplot as plt
-
+import seaborn as sns
     
 #*** Plots ***
-#plt.rc('text', usetex=True)
-col = [(1,0,0,1),(0,1,0,1),(0,0,1,1),(0.55,0.45,0,1),(0.5,0.,0.5,1)]
-lsty = [':','--','-.','--',':','-.']
 
+lsty = [':','--','-.','--',':','-.']
+marker = ['s', '^', 'P', "o", "p", "3", "4",  "8", "*" ]
 
 
 titles = [r'$(AB)_{1/4}-C_{3/4}$', r'$(AB)_{1/2}-C_{1/2}$', r'$(AB)_{3/4}-C_1$', r'$Tr(D_{1/4}) (AB)_{1/4}-C_{1/4}$', r'$Tr(D_{1/4}) (AB)_{1/2}-C_{1/4}$', r'$Tr(D_{1/2}) (AB)_{1/4}-C_{1/4}$', r'$Tr((AB)_{1/4}) C_{1/2}-D_{1/4}$', r'$Tr((AB)_{1/2}) C_{1/4}-D_{1/4}$']
@@ -22,7 +21,7 @@ titles = [r'$(AB)_{1/4}-C_{3/4}$', r'$(AB)_{1/2}-C_{1/2}$', r'$(AB)_{3/4}-C_1$',
 
 def logneg_vs_r(r, GHZN0ln, GHZN1ln, tot, modes, krr):
     labels = ['N='+str(modes[i])+' $k=$'+'%.2f' % krr[i] for i in range(tot)]
-    
+    col = sns.color_palette("hls", len(krr))
 # =============================================================================
 #     # Make figure
 #     font ={#'family' : 'normal',
@@ -86,6 +85,8 @@ def logneg_vs_r(r, GHZN0ln, GHZN1ln, tot, modes, krr):
     
 def Gain_vs_r(r, Gain, tot, modes, krr):
     labels = ['N='+str(modes[i])+' $k=$'+'%.2f' % krr[i] for i in range(tot)]
+    col = sns.color_palette("hls", len(krr))
+    
     fig, axes = plt.subplots(4, 2, figsize=(8, 10))
     axes = axes.flatten()
     for k in range(8):
@@ -96,6 +97,33 @@ def Gain_vs_r(r, Gain, tot, modes, krr):
                  gain.set_label(labels[i])
         if k+1>6:
             axes[k].set_xlabel('Squeezing $(r)$')
+        if k % 2 == 0:
+            axes[k].set_ylabel('Gain')
+        axes[k].grid(True)
+        
+        axes[k].set_title(titles[k])
+    fig.legend(loc='lower center', bbox_to_anchor=(0.5, 0.), ncol=1)
+    plt.tight_layout(rect=[0, 0.12, 1, 1])
+    
+def Gain_vs_N(r, Gain, tot, modes, krr):
+    labels = ['$k=$'+'%.2f' % krr[i] for i in range(tot)]
+    col = sns.color_palette("hls", len(krr))
+    
+    fig, axes = plt.subplots(4, 2, figsize=(8, 10))
+    axes = axes.flatten()
+    for k in range(8):
+        for i in range(tot):
+            if k==1:
+                #axes[k].plot(np.arange(modes[0]-2,modes[-1]+1,2), Gain[k][i], color=col[i], linewidth=2)
+                gain, = axes[k].plot(np.arange(modes[0]-2,modes[-1]+1,2), Gain[k][i], color=col[i], marker=marker[i], linewidth=2)
+                
+                gain.set_label(labels[i])
+            else:
+                #axes[k].plot(modes, Gain[k][i][0:len(modes)], color=col[i], linewidth=2)
+                gain, = axes[k].plot(modes, Gain[k][i][0:len(modes)], color=col[i],  marker=marker[i], linewidth=2)
+                
+        if k+1>6:
+            axes[k].set_xlabel('Number of Modes $(N)$')
         if k % 2 == 0:
             axes[k].set_ylabel('Gain')
         axes[k].grid(True)
